@@ -3,9 +3,8 @@
 ## Code Challenge 
 https://adventofcode.com/2019/
 
-
 Stack : 
-* Node +11
+* Node +12
 * Typescript
 * Jest
 

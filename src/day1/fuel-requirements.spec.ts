@@ -1,7 +1,7 @@
 import {
     computeRequiredFuel,
     computeRequiredFuelWithFuelIncluded,
-    computeTotalRequiredFuelWithFuelIncluded
+    computeTotalRequiredFuelWithFuelIncluded,
 } from "./fuel-requirements";
 import {readFileAsLines} from "../utils/input";
 
@@ -18,9 +18,9 @@ describe('Fuel requirements', () => {
     });
 
     it('should compute the fuel requirements for the spacecraft', () => {
-        const moduleMasses = readFileAsLines('/Users/lang/IdeaProjects/advent-of-code-2019/src/day1/input.txt')
-            .filter(v => v)
-            .map(v => +v);
+        const moduleMasses = readFileAsLines('day1/input.txt')
+          .filter(v => v)
+          .map(v => +v);
 
         const computedMass = computeRequiredFuel(moduleMasses);
         console.log('Fuel requirements for the spacecraft: ', computedMass);
@@ -35,12 +35,12 @@ describe('Fuel requirements', () => {
     });
 
     it('should compute recursively the fuel requirements for the spacecraft including the fuel mass', () => {
-        const moduleMasses = readFileAsLines('/Users/lang/IdeaProjects/advent-of-code-2019/src/day1/input.txt')
-            .filter(v => v)
-            .map(v => +v);
+        const moduleMasses = readFileAsLines('day1/input.txt')
+          .filter(v => v)
+          .map(v => +v);
 
         const computedMass = computeTotalRequiredFuelWithFuelIncluded(moduleMasses);
-        console.log('Fuel requirements for the spacecraft (fuel inclued): ', computedMass);
+        console.log('Fuel requirements for the spacecraft (fuel included): ', computedMass);
         expect(computedMass).toEqual(5142043);
     });
 });
