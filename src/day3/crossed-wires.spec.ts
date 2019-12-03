@@ -1,10 +1,11 @@
 import {
-  deserializePoint,
-  findCrossingWires,
-  generatePoints,
-  getManhattanDistanceOfClosestIntersection,
-  getPathPoints,
-  serializePoint,
+    deserializePoint,
+    findCrossingWires,
+    findMinStepsForIntersection,
+    generatePoints,
+    getManhattanDistanceOfClosestIntersection,
+    getPathPoints,
+    serializePoint,
 } from './crossed-wires';
 import {readFileAsLines} from '../utils/input';
 
@@ -78,4 +79,23 @@ describe('Crossed Wire', () => {
     expect(getManhattanDistanceOfClosestIntersection(wire1, wire2)).toEqual(855);
   });
 
+
+    it('should compute minimum steps to reach intersection', () => {
+        const wire1 = 'R8,U5,L5,D3';
+        const wire2 = 'U7,R6,D4,L4';
+        expect(findMinStepsForIntersection(wire1, wire2)).toEqual(30);
+
+        const wire1b = 'R75,D30,R83,U83,L12,D49,R71,U7,L72';
+        const wire2b = 'U62,R66,U55,R34,D71,R55,D58,R83';
+        expect(findMinStepsForIntersection(wire1b, wire2b)).toEqual(610);
+
+        const wire1c = 'R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51';
+        const wire2c = 'U98,R91,D20,R16,D67,R40,U7,R15,U6,R7';
+        expect(findMinStepsForIntersection(wire1c, wire2c)).toEqual(410);
+    });
+
+    it('should find minimum steps to reach intersection for the ship ', () => {
+        const [wire1, wire2] = readFileAsLines('day3/paths.txt');
+        expect(findMinStepsForIntersection(wire1, wire2)).toEqual(11238);
+    });
 });

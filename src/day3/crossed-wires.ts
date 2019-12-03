@@ -12,7 +12,7 @@ export function serializePoint(point: Point): string {
 
 export function deserializePoint(value: string): Point {
   const [x, y] = value.split('/')
-    .map(v => +v);
+      .map(v => +v);
   return {x, y};
 }
 
@@ -48,7 +48,7 @@ function getMove(direction): ((Point) => Point) {
       });
       break;
     default:
-    // nothing;
+      // nothing;
   }
   return move;
 }
@@ -93,14 +93,34 @@ export function findCrossingWires(wire1: string, wire2: string): Array<Point> {
   const crossing = intersect([points1, points2]);
   // remove origin
   return crossing.filter(p => p !== '0/0')
-    .map(deserializePoint);
+      .map(deserializePoint);
 }
 
 export function getManhattanDistanceOfClosestIntersection(wire1: string, wire2: string): number {
   const intersections = findCrossingWires(wire1, wire2);
   const numbers = intersections
     //.filter(p => p.x >= 0 && p.y >= 0)
-    .map(p => Math.abs(p.x) + Math.abs(p.y));
+      .map(p => Math.abs(p.x) + Math.abs(p.y));
   return numbers
-    .reduce((a, b) => Math.min(a, b));
+      .reduce((a, b) => Math.min(a, b));
+}
+
+export function findMinStepsForIntersection(wire1: string, wire2: string): number {
+
+  const stepsToPoint = (point: string, points: Array<string>) =>
+      points.indexOf(point);
+
+  const points1 = getPathPoints(wire1).map(serializePoint);
+  const points2 = getPathPoints(wire2).map(serializePoint);
+
+  const intersections = intersect([points1, points2])
+      .filter(p => p !== '0/0');
+
+  return intersections
+      .map(p => [
+        stepsToPoint(p, points1),
+        stepsToPoint(p, points2)
+      ])
+      .map(([steps1, steps2]) => steps1 + steps2)
+      .reduce((a, b) => Math.min(a, b));
 }
