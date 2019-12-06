@@ -10,7 +10,8 @@ function parse(command: string): Array<number> {
 
 export interface Instruction {
     opcode: number,
-    operation: ((a: number, b?: number) => number | void);
+  operation?: ((a: number, b?: number) => number | void);
+  jump?: (a: number) => boolean;
     length: number;
     modes: Array<boolean>;
 }
@@ -24,6 +25,7 @@ export function parseInstruction(instruction: number): Instruction {
 
     let length = 4;
     let operation;
+  let jump;
     switch (opcode) {
         case 1:
             operation = (a: number, b: number) => a + b;
@@ -39,12 +41,28 @@ export function parseInstruction(instruction: number): Instruction {
             operation = (a: number) => console.log(a);
             length = 2;
             break;
+      case 5:
+        jump = (a: number) => a != 0;
+        length = 3;
+        break;
+      case 6:
+        jump = (a: number) => a == 0;
+        length = 3;
+        break;
+      case 7:
+        operation = (a: number, b: number) => +(a < b);
+        break;
+      case 8:
+        operation = (a: number, b: number) => +(a == b);
+        break;
+
         default:
         // nothing
     }
     return {
         opcode,
         operation,
+      jump,
         length,
         modes,
     };
@@ -53,9 +71,11 @@ export function parseInstruction(instruction: number): Instruction {
 export function executeCommandSeq(intCommands: Array<number>, input: number = 1, debug: boolean = false): Array<number> {
     let i = 0, length = 4;
     while (intCommands[i] != 99 && i < intCommands.length) {
+
         const {
             opcode,
             operation,
+          jump,
             length: newLength,
             modes,
         } = parseInstruction(intCommands[i]);
@@ -75,7 +95,7 @@ export function executeCommandSeq(intCommands: Array<number>, input: number = 1,
                 ? i + 3
                 : intCommands[i + 3];
         if (debug) {
-            console.log({
+          console.debug({
                 index: i,
                 opcode,
                 input1,
@@ -85,17 +105,37 @@ export function executeCommandSeq(intCommands: Array<number>, input: number = 1,
             });
         }
 
-
-        if (length == 4) {
-            intCommands[position] = operation(input1, input2) as number;
-        } else if (opcode == 3) {
-            intCommands[position] = operation(input) as number;
-        } else if (opcode == 4) {
-            operation(input1);
+      let doTheJump = false;
+      switch (opcode) {
+        case 1:
+        case 2:
+        case 7:
+        case 8:
+          intCommands[position] = operation(input1, input2) as number;
+          break;
+        case 3:
+          intCommands[position] = operation(input) as number;
+          break;
+        case 4:
+          operation(input1);
+          break;
+        case 5:
+        case 6:
+          doTheJump = jump(input1);
+          break;
+        default:
+          // nothing
         }
 
         // for the next loop
+      if (doTheJump) {
+        i = input2;
+      } else {
         i += length;
+      }
+      if (debug) {
+        console.debug(intCommands);
+      }
     }
     return intCommands;
 }
