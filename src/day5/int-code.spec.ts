@@ -1,6 +1,10 @@
 import {compute, executeCommandSeq, parseInstruction} from './int-code';
 
 describe('Int Code Day 5', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+
     it('should compute the given test commands', () => {
         expect(executeCommandSeq([1, 0, 0, 0, 99])).toEqual([2, 0, 0, 0, 99]);
         expect(executeCommandSeq([2, 3, 0, 3, 99])).toEqual([2, 3, 0, 6, 99]);

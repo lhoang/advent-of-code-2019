@@ -4,7 +4,6 @@ import {
     findAllPossiblePasswordsWithOneDouble,
     hasAdjacentNumbers,
     onlyIncrease,
-    range
 } from "./secure-container";
 
 describe('Secure Container', () => {
@@ -21,10 +20,6 @@ describe('Secure Container', () => {
         expect(onlyIncrease('111111')).toBeTruthy();
         expect(onlyIncrease('121111')).toBeFalsy();
         expect(onlyIncrease('123450')).toBeFalsy();
-    });
-
-    it('should generate range', () => {
-        expect(range(2, 5)).toEqual([2, 3, 4, 5]);
     });
 
     it('should generate all possible passwords', () => {
