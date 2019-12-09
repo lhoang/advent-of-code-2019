@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@types/node": "^12.12.14",
-    "fast_array_intersect": "^1.1.0"
+    "fast_array_intersect": "^1.1.0",
+    "rxjs": "^6.5.3"
   }
 }
