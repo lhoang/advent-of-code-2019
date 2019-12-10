@@ -147,7 +147,7 @@ export function executeCommandSeq(intCommands: Array<number>,
 }
 
 export function compute(file: string, input: number) {
-    const [commands] = readFileAsLines('file');
+    const [commands] = readFileAsLines(file);
     executeCommandSeq(parse(commands), [input]);
 }
 
