@@ -1,11 +1,17 @@
-import {findBestMonitoringLocation, generateAllSights, isHidden, isOnMap, parse, toSight} from "./monitoring-station";
+import {
+    findAllInSight,
+    findBestMonitoringLocation,
+    getRelativeAsteroids,
+    isHidden,
+    parse,
+    RelativeAsteroid,
+    toAsteroid,
+    toRelativeAsteroid,
+    vaporize,
+    vaporizeOneRotation
+} from "./monitoring-station";
 
 describe('Monitoring Station', () => {
-    it('should tell if a asteroid is on the map', () => {
-        expect(isOnMap({x: 0, y: 7}, 10, 10)).toBeTruthy();
-        expect(isOnMap({x: -1, y: 7}, 10, 10)).toBeFalsy();
-        expect(isOnMap({x: 4, y: 12}, 10, 10)).toBeFalsy();
-    });
 
     it('should find hidden asteroids', () => {
         const existing = [
@@ -25,11 +31,22 @@ describe('Monitoring Station', () => {
         expect(isHidden({vx: 3, vy: -1}, existing)).toBeFalsy();
     });
 
-    it('should transform an asteroid to a sight', () => {
-        expect(toSight({x: 2, y: 3}, {x: 1, y: 1})).toEqual({vx: 1, vy: 2, distance: 2.24});
-        expect(toSight({x: 2, y: 3}, {x: 0, y: 0})).toEqual({vx: 2, vy: 3, distance: 3.61});
-        expect(toSight({x: 2, y: 3}, {x: 4, y: 4})).toEqual({vx: -2, vy: -1, distance: 2.24});
-        expect(toSight({x: 1, y: 4}, {x: 4, y: 4})).toEqual({vx: -3, vy: 0, distance: 3});
+    it('should transform an asteroid to a relative asteroid', () => {
+        expect(toRelativeAsteroid({x: 2, y: 3}, {x: 1, y: 1}))
+            .toMatchObject({vx: 1, vy: 2, distance: 2.24});
+        expect(toRelativeAsteroid({x: 2, y: 3}, {x: 0, y: 0}))
+            .toMatchObject({vx: 2, vy: 3, distance: 3.61});
+        expect(toRelativeAsteroid({x: 2, y: 3}, {x: 4, y: 4}))
+            .toMatchObject({vx: -2, vy: -1, distance: 2.24});
+        expect(toRelativeAsteroid({x: 1, y: 4}, {x: 4, y: 4}))
+            .toMatchObject({vx: -3, vy: 0, distance: 3});
+    });
+
+    it('should have the right angle', () => {
+        expect(toRelativeAsteroid({x: 2, y: 0}, {x: 2, y: 2})).toMatchObject({angle: 0});
+        expect(toRelativeAsteroid({x: 4, y: 2}, {x: 2, y: 2})).toMatchObject({angle: 90});
+        expect(toRelativeAsteroid({x: 2, y: 4}, {x: 2, y: 2})).toMatchObject({angle: 180});
+        expect(toRelativeAsteroid({x: 0, y: 2}, {x: 2, y: 2})).toMatchObject({angle: 270});
     });
 
     it('should parse the small map', () => {
@@ -49,8 +66,8 @@ describe('Monitoring Station', () => {
 
     it('should find all asteroids in sight', () => {
         const asteroids = parse('day10/smallMap.txt');
-        expect(generateAllSights({x: 4, y: 2}, asteroids)).toHaveLength(5);
-        expect(generateAllSights({x: 3, y: 4}, asteroids)).toHaveLength(8);
+        expect(findAllInSight({x: 4, y: 2}, asteroids)).toHaveLength(5);
+        expect(findAllInSight({x: 3, y: 4}, asteroids)).toHaveLength(8);
     });
 
     it('should find the best location (test data)', () => {
@@ -73,5 +90,34 @@ describe('Monitoring Station', () => {
     it('should find the best location', () => {
         const data = parse('day10/map.txt');
         expect(findBestMonitoringLocation(data)).toEqual([{x: 22, y: 19}, 282]);
+    });
+
+    it('should vaporize asteroids in one rotation', () => {
+        const toA = (sight: RelativeAsteroid) => toAsteroid(sight, {x: 8, y: 3});
+
+        const asteroids = parse('day10/testVaporisation.txt');
+        const allSights = getRelativeAsteroids(asteroids, {x: 8, y: 3});
+        const sights = vaporizeOneRotation(allSights);
+        const firstRotationDestroyed = sights
+            .map(toA);
+        expect(firstRotationDestroyed).toHaveLength(30);
+        expect(firstRotationDestroyed[0]).toMatchObject({x: 8, y: 1});
+        expect(firstRotationDestroyed[29]).toMatchObject({x: 7, y: 0});
+    });
+
+    it('should vaporize (test data)', () => {
+        const asteroids = parse('day10/testVaporisation.txt');
+        const res = vaporize(asteroids, {x: 8, y: 3});
+        expect(res).toHaveLength(36);
+        expect(res[0]).toEqual({x: 8, y: 1});
+        expect(res[35]).toEqual({x: 14, y: 3});
+    });
+
+    it('should vaporize !', () => {
+        const asteroids = parse('day10/map.txt');
+        const res = vaporize(asteroids, {x: 22, y: 19});
+        expect(res).toHaveLength(365);
+        expect(res[0]).toEqual({x: 22, y: 16});
+        expect(res[199]).toEqual({x: 10, y: 8});
     });
 });
